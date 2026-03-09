@@ -1,0 +1,43 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl      = env("DIRECT_URL")
+}
+
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  username      String   @unique
+  password_hash String
+  meetings      Meeting[]
+  created_at    DateTime @default(now())
+}
+
+model Meeting {
+  id          String   @id @default(uuid())
+  meetingCode String   @unique
+  hostId      String
+  host        User     @relation(fields: [hostId], references: [id])
+  participants Participant[]
+  created_at  DateTime @default(now())
+  ended_at    DateTime?
+}
+
+model Participant {
+  id         String   @id @default(uuid())
+  meetingId  String
+  meeting    Meeting  @relation(fields: [meetingId], references: [id])
+  userId     String
+  joined_at  DateTime @default(now())
+  left_at    DateTime?
+}
