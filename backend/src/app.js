@@ -11,6 +11,7 @@ import authRoutes from "./routes/auth.route.js";
 import meetingRoutes from "./routes/meeting.route.js";
 import historyRoutes from "./routes/history.route.js";
 import { socketHandler } from "./socket/index.js";
+import summarizeRoutes from "./routes/summarize.route.js";
 
 const app = express();
 const server = http.createServer(app);
@@ -53,6 +54,7 @@ app.use(globalLimiter);
 app.use("/api/auth", authRoutes);
 app.use("/api/meeting", meetingRoutes);
 app.use("/api/history", historyRoutes);
+app.use("/api/ai", summarizeRoutes)
 
 socketHandler(io);
 

@@ -12,6 +12,9 @@ import { Grid2x2, LayoutTemplate, Users, Pin, UserMinus, PinOff, Hand, BarChart2
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { io } from 'socket.io-client';
+import { useMeetingRecorder } from '@/hooks/useMeetingRecorder';
+import MeetingSummaryModal from '@/components/MeetingSummary';
+import { Sparkles } from "lucide-react";
 
 
 //Video Grid 
@@ -167,6 +170,9 @@ const Room = () => {
     const [elapsed, setElapsed] = useState(0);
     const [unreadMessages, setUnreadMessages] = useState(0);
 
+    const [showSummary, setShowSummary] = useState(false);
+    const { startRecording, stopRecording, isRecording, audioBlob } = useMeetingRecorder();
+
     const username = user?.username || "Guest";
     const userId = user?.id || null;
 
@@ -208,6 +214,7 @@ const Room = () => {
                 });
                 setParticipantId(data.participantId);
                 setIsHost(data.isHost);
+                startRecording();
 
                 //Socket connection after DB is confirmed
                 const newSocket = io(import.meta.env.VITE_SOCKET_URL || "http://localhost:5000", {
@@ -480,6 +487,18 @@ const Room = () => {
                             <LayoutTemplate className="w-3.5 h-3.5" /> Speaker
                         </Button>
                     </div>
+                    {/* Summarize Button */}
+                    <Button
+                        size="sm"
+                        onClick={() => {
+                            stopRecording();
+                            setShowSummary(true);
+                        }}
+                        className="h-8 px-3 gap-1.5 text-xs bg-blue-600/20 hover:bg-blue-600 text-blue-400 hover:text-white border border-blue-500/30 hover:border-blue-500 rounded-xl transition-all duration-200"
+                    >
+                        <Sparkles className="w-3.5 h-3.5" />
+                        Summarize
+                    </Button>
                 </div>
             </div>
 
@@ -549,6 +568,13 @@ const Room = () => {
                 onLeave={handleLeave}
                 roomCode={roomCode}
             />
+            {/* AI Summary */}
+      {showSummary && (
+        <MeetingSummaryModal
+          audioBlob={audioBlob}
+          onClose={() => setShowSummary(false)}
+        />
+      )}
         </div>
     );
 };
