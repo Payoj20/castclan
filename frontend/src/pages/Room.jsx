@@ -171,7 +171,7 @@ const Room = () => {
     const [unreadMessages, setUnreadMessages] = useState(0);
 
     const [showSummary, setShowSummary] = useState(false);
-    const { startRecording, stopRecording, isRecording, audioBlob } = useMeetingRecorder();
+    const { startRecording, stopRecording, addRemoteStream, removeRemoteStream, isRecording, audioBlob } = useMeetingRecorder();
 
     const username = user?.username || "Guest";
     const userId = user?.id || null;
@@ -214,7 +214,6 @@ const Room = () => {
                 });
                 setParticipantId(data.participantId);
                 setIsHost(data.isHost);
-                startRecording();
 
                 //Socket connection after DB is confirmed
                 const newSocket = io(import.meta.env.VITE_SOCKET_URL || "http://localhost:5000", {
@@ -318,6 +317,21 @@ const Room = () => {
         cameraOn, micOn, sharingScreen, roomUserCount,
         toggleCamera, toggleMic, startScreenShare, stopScreenShare
     } = useWebRTC(socket, roomCode, username, userId, participantId);
+
+    //Recording start
+    useEffect(() => {
+        if (localStream && participantId) {
+            startRecording(localStream);
+        }
+    }, [localStream, participantId]);
+
+    useEffect(() => {
+        Object.entries(remoteStreams).forEach(([socketId, data]) => {
+            if (data.stream) {
+                addRemoteStream(socketId, data.stream);
+            }
+        });
+    }, [remoteStreams]);
 
     //Disconnect
     const handleLeave = async () => {
@@ -569,12 +583,12 @@ const Room = () => {
                 roomCode={roomCode}
             />
             {/* AI Summary */}
-      {showSummary && (
-        <MeetingSummaryModal
-          audioBlob={audioBlob}
-          onClose={() => setShowSummary(false)}
-        />
-      )}
+            {showSummary && (
+                <MeetingSummaryModal
+                    audioBlob={audioBlob}
+                    onClose={() => setShowSummary(false)}
+                />
+            )}
         </div>
     );
 };

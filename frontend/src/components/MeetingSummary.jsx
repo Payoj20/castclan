@@ -13,7 +13,15 @@ const MeetingSummaryModal = ({ audioBlob, onClose }) => {
   const [copied, setCopied] = useState(false);
 
   const generateSummary = async () => {
-    if (!audioBlob) return;
+    if (!audioBlob) {
+      setError("No audio recorded. Make sure your microphone is working.");
+      return;
+    }
+
+    if (audioBlob.size < 10000) {
+      setError("Recording is too short. Please talk for at least 30 seconds before summarizing.");
+      return;
+    }
     setLoading(true);
     setError(null);
 
