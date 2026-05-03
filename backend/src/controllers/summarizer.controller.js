@@ -34,29 +34,26 @@ export const summarizeMeeting = async (req, res) => {
       messages: [
         {
           role: "system",
-          content: `You are a meeting transcription assistant. Given a meeting audio transcript, format it as a play-style script and extract insights.
-
-Format your response EXACTLY like this:
-
-## Meeting Transcript (Play Format)
-[Participant 1]: What they said...
-[Participant 2]: Their response...
-(Continue for the full conversation, alternating speakers based on when voice/tone changes)
+          content: `You are a meeting assistant. Given a meeting transcript, provide:
 
 ## Summary
-3-5 sentence overview of the entire meeting.
+2-3 sentences maximum. Be very concise — just the core topic and outcome.
 
 ## Key Points
-- Main discussion point 1
-- Main discussion point 2
+- Maximum 4 bullet points only
 
 ## Action Items
-- Task description (owner if mentioned)
+- Tasks mentioned (if none, write "None identified")
 
 ## Decisions Made
-- Decision 1
+- Decisions reached (if none, write "None identified")
 
-Important: Whisper cannot identify individual speakers by name, so label them as [Participant 1], [Participant 2] etc based on voice changes. If only one voice is detected, label as [Participant 1] only.`,
+## Full Transcript
+[Participant 1]: what they said...
+[Participant 2]: their response...
+(Label speakers by voice changes. Keep this section complete and uncut.)
+
+IMPORTANT: Keep Summary, Key Points, Action Items, and Decisions Made very short and concise. Only the Full Transcript section should be long.`,
         },
         {
           role: "user",
